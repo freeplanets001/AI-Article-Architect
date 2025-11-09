@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>世界一優秀な記事執筆アプリ</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^0.14.0",
+    "chart.js/auto": "https://esm.sh/chart.js/auto",
+    "chart.js/": "https://aistudiocdn.com/chart.js@^4.5.0/"
+  }
+}
+</script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>AI Article Architect ✍️</h1>
+      <p>あなたのアイデアを、AIが画像付きの高品質な記事に昇華させます。</p>
+    </header>
+    <div class="container">
+      <div class="settings">
+        <div class="mode-selector">
+          <button id="mode-strategy-btn" class="mode-btn" data-mode="strategy">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.5 11L18 7.5 14.5 4l-1.5 1.5L15 7.5 11.5 11l-2-2L8 7.5 4.5 11 3 9.5 7.5 5l4 4 4-4L21 9.5 14.5 16l-3-3-4 4L9 18.5l4-4 3 3z"/></svg>
+            戦略立案
+          </button>
+          <button id="mode-create-btn" class="mode-btn active" data-mode="create">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>
+             新規作成
+          </button>
+          <button id="mode-history-btn" class="mode-btn" data-mode="history">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-6 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 16H6v-1.4c0-2 4-3.1 6-3.1s6 1.1 6 3.1V20z"/></svg>
+            商品管理
+          </button>
+        </div>
+        <div class="settings-header">
+            <h2 id="settings-title">記事の設計図を作成</h2>
+            <div class="settings-header-actions">
+              <button id="brand-voice-btn" title="ブランドボイス設定">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><g><rect fill="none" height="24" width="24"/></g><g><g><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10c5.52,0,10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8 s8,3.59,8,8S16.41,20,12,20z"/><path d="M12,11c-1.66,0-3-1.34-3-3s1.34-3,3-3s3,1.34,3,3S13.66,11,12,11z M12,7c-0.55,0-1,0.45-1,1s0.45,1,1,1s1-0.45,1-1 S12.55,7,12,7z"/><path d="M12,13c-2.33,0-4.31,1.46-5.11,3.5h10.22C16.31,14.46,14.33,13,12,13z"/></g></g></svg>
+                  <span>ブランドボイス</span>
+              </button>
+              <button id="api-key-btn" title="APIキー設定">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12.22 2h-.44L9.5 5.5 6.22 3.93l-1.69 2.93 2.84 2.13-1.6 3.47L1.93 11.2l-1.7 2.93 3.32 1.57L5.5 18.5l3.47-1.6 2.13 2.84 2.93-1.69-1.57-3.32L14.07 16l3.47 1.6-1.6-3.47 2.84-2.13-1.69-2.93-3.32 1.57L12.22 2zM12 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/></svg>
+                <span>設定</span>
+              </button>
+            </div>
+        </div>
+
+
+        <div id="strategy-mode-content" class="tab-content hidden">
+            <div class="form-group">
+                <label for="strategy-theme">記事のメインテーマ</label>
+                <input type="text" id="strategy-theme" name="strategy-theme" placeholder="例: 副業、Webマーケティング、健康">
+            </div>
+            <div class="strategy-actions">
+              <button id="strategy-generate-btn">
+                <span class="button-text">AIに戦略を提案させる</span>
+                <div class="spinner hidden"></div>
+              </button>
+              <button id="strategy-generate-from-data-btn">
+                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.08c-2.03 0-3.8-1.1-4.72-2.73l1.5-1.02c.64 1.13 1.88 1.9 3.22 1.9 1.41 0 2.5-1.02 2.5-2.26 0-1.07-.68-1.85-1.86-2.17l-1.63-.44c-.94-.25-1.51-.83-1.51-1.67 0-.85.67-1.56 1.6-1.56 1.03 0 1.83.61 2.21 1.45l-1.48.96C9.97 8.24 9.3 7.9 8.65 7.9c-.66 0-1.15.54-1.15 1.15 0 .62.39 1.02 1.2 1.25l1.64.43c1.08.28 1.86.93 1.86 2.02 0 1.25-1.04 2.34-2.82 2.34zm4.84-2.35l.99 1.65-1.74.88-1-1.65c-.47.25-.99.4-1.53.4V17h-1.5v-1.5h-1.12v-1.5h1.12v-2.31h1.5V12.5h1.8v-1.5h1.5v1.5h1.08v1.5h-1.08v2.28c0 .58.42 1.01.99 1.01.21 0 .41-.06.59-.16z"/></svg>
+                <span class="button-text">過去の成功データから提案</span>
+                <div class="spinner hidden"></div>
+              </button>
+            </div>
+            <div id="strategy-results-container" class="hidden">
+              <h3>AIからの戦略提案</h3>
+              <p class="strategy-instruction">以下の提案から1つ選択すると、記事の設計図が自動で作成されます。</p>
+              <table id="strategy-results-table">
+                <thead>
+                  <tr>
+                    <th>キーワード</th>
+                    <th>検索意図</th>
+                    <th>ターゲットペルソナ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- AIによる提案がここに挿入されます -->
+                </tbody>
+              </table>
+            </div>
+        </div>
+
+        <div id="create-mode-content" class="tab-content">
+          <div id="step-1-persona-input">
+            <form id="article-form">
+              <div class="form-group">
+                <label for="theme">記事のテーマ・キーワード</label>
+                <input type="text" id="theme" name="theme" placeholder="例: 最新のAIトレンド、効果的なSNSマーケティング" required>
+              </div>
+              <div class="form-group">
+                <label for="persona">ターゲット読者 (ペルソナ)</label>
+                <input type="text" id="persona" name="persona" placeholder="例: Web開発初心者、企業のマーケティング担当者">
+              </div>
+               <div class="form-group">
+                <label for="expert-persona">エキスパート設定 (任意)</label>
+                 <p class="form-hint">AIに特定の専門家になりきらせ、より専門性の高い記事を生成します。</p>
+                <input type="text" id="expert-persona" name="expert-persona" placeholder="例: 経験15年のファイナンシャルプランナー, 現役の小児科医">
+              </div>
+              <div class="form-group">
+                  <label for="reference-text">参照資料 (任意)</label>
+                  <p class="form-hint">記事の元になるテキストファイル(.txt, .md)をアップロードするか、内容を直接貼り付けてください。PDFの場合はテキストをコピー＆ペーストしてください。</p>
+                  <div id="file-upload-area" class="file-upload-area">
+                    <input type="file" id="file-upload-input" accept=".txt,.md,text/plain" class="hidden">
+                    <label for="file-upload-input" class="file-upload-label">
+                      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                      <span>ファイルを選択 または ドラッグ＆ドロップ</span>
+                    </label>
+                  </div>
+                  <div id="file-info" class="hidden"></div>
+                  <textarea id="reference-text" name="reference-text" rows="6" placeholder="ここに参照テキストを貼り付け..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="tone">記事のトーン</label>
+                <select id="tone" name="tone">
+                  <option value="専門的">専門的</option>
+                  <option value="フレンドリー" selected>フレンドリー</option>
+                  <option value="丁寧">丁寧</option>
+                  <option value="情熱的">情熱的</option>
+                  <option value="ユーモラス">ユーモラス</option>
+                </select>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>記事の種類</label>
+                  <div class="radio-group">
+                      <label for="type-free" class="radio-label">
+                          <input type="radio" id="type-free" name="article_type" value="free" checked>
+                          <span>無料記事</span>
+                      </label>
+                      <label for="type-paid" class="radio-label">
+                          <input type="radio" id="type-paid" name="article_type" value="paid">
+                          <span>有料記事</span>
+                      </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>AIビデオ・プロデューサー 🎬</label>
+                   <div class="toggle-switch-container">
+                      <label class="toggle-switch">
+                          <input type="checkbox" id="generate-video-toggle">
+                          <span class="slider"></span>
+                      </label>
+                      <span class="toggle-label">紹介動画を生成する (ON/OFF)</span>
+                   </div>
+                </div>
+              </div>
+               <div class="form-group sales-settings">
+                <h3>💰 販売設定 (任意)</h3>
+                <div class="form-group">
+                    <label for="price">販売価格 (円)</label>
+                    <input type="number" id="price" name="price" placeholder="例: 500">
+                </div>
+                <div class="form-group">
+                    <label for="product-description">商品説明</label>
+                    <textarea id="product-description" name="product-description" rows="3" placeholder="販売ページに表示される、商品の魅力的な説明文を入力"></textarea>
+                </div>
+              </div>
+              <button type="submit" id="analyze-persona-btn">
+                <span class="button-text">構成案をAIに提案させる</span>
+                <div class="spinner hidden"></div>
+              </button>
+            </form>
+          </div>
+
+          <div id="step-2-outline-suggestions" class="hidden">
+            <h3>🤖 AIからの構成案提案</h3>
+            <p class="strategy-instruction">ペルソナ分析に基づいた最適な構成案です。1つ選んでデザインの選択に進んでください。</p>
+            <div id="outline-cards-container">
+                <!-- AIによる構成案カードがここに挿入されます -->
+            </div>
+            <button id="back-to-form-btn" class="secondary-button">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+              入力に戻る
+            </button>
+          </div>
+          
+          <div id="step-3-creative-director" class="hidden">
+            <h3>🎨 AIクリエイティブ・ディレクター</h3>
+            <p class="strategy-instruction">記事の印象を決めるデザインスタイルを選択してください。選んだスタイルが記事全体に反映されます。</p>
+            <div id="creative-direction-container">
+                <!-- AIによるクリエイティブディレクションカードがここに挿入されます -->
+            </div>
+            <button id="back-to-outlines-btn" class="secondary-button">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                構成案の選択に戻る
+            </button>
+          </div>
+
+          <!-- This button is hidden but will be used to trigger generation programmatically -->
+          <button type="submit" id="generate-button" class="hidden">
+            <span class="button-text">記事を生成する</span>
+            <div class="spinner hidden"></div>
+          </button>
+        </div>
+        
+        <div id="history-mode-content" class="tab-content hidden">
+            <div id="history-list-container">
+                <ul id="history-list">
+                    <!-- 履歴がここに挿入されます -->
+                </ul>
+            </div>
+        </div>
+
+      </div>
+      <div class="result-container">
+        <div id="progress" class="progress-container"></div>
+        <div id="result" class="hidden">
+          <div id="view-mode-container">
+            <div class="result-header">
+               <h2>生成された記事</h2>
+               <div class="result-actions">
+                   <button id="read-aloud-button" title="ブラウザの機能で読み上げる">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                      <span class="button-text">読み上げ</span>
+                   </button>
+                   <button id="generate-audio-btn" title="AIによる高品質な音声で記事を聴く">
+                      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                      <span class="button-text">オーディオ記事</span>
+                      <div class="spinner hidden"></div>
+                   </button>
+                   <button id="proofread-button" title="AIによる最終校正">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12.45 16h2.09L9.43 3H7.57L2.46 16h2.09l1.12-3h5.64l1.14 3zm-6.02-5L8.5 5.48 10.57 11H6.43zm15.16.59l-8.09 8.09L9.83 16l-1.41 1.41 5.09 5.09L23 13l-1.41-1.41z"/></svg>
+                     <span class="button-text">AI校正</span>
+                     <div class="spinner hidden"></div>
+                   </button>
+                   <button id="fact-check-btn" title="AIによるファクトチェック">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                     <span class="button-text">ファクトチェック</span>
+                     <div class="spinner hidden"></div>
+                   </button>
+                   <button id="schedule-button" title="公開を予約する">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                      <span class="button-text">予約</span>
+                   </button>
+                   <button id="edit-button" title="記事を編集する">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/></svg>
+                      <span class="button-text">編集</span>
+                   </button>
+                   <button id="copy-button" title="記事のテキストをコピー">
+                      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                      <span class="button-text">コピー</span>
+                   </button>
+               </div>
+            </div>
+            <div id="article-wrapper">
+              <div id="cover-image-container" class="hidden"></div>
+              <div id="audio-player-container" class="hidden"></div>
+              <div id="video-container" class="hidden">
+                  <h3 class="enhancement-title">🎬 AIビデオ・プロデューサー</h3>
+                  <div id="veo-key-selection" class="hidden">
+                    <button id="select-veo-key-btn">APIキーを選択して動画を生成</button>
+                  </div>
+                  <div id="video-progress" class="hidden"></div>
+                  <video id="video-player" controls class="hidden"></video>
+                  <a id="video-download-link" class="secondary-button hidden" download="generated-video.mp4">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    動画をダウンロード
+                  </a>
+              </div>
+              <div id="performance-analysis-container" class="hidden">
+                <h3 class="enhancement-title">📊 AIパフォーマンスアナライザー</h3>
+                <div id="user-input-performance-container"></div>
+                <div id="performance-analysis-wrapper">
+                  <!-- AIによるパフォーマンス分析結果がここに挿入されます -->
+                </div>
+              </div>
+              <div id="fact-check-container" class="hidden">
+                 <h3 class="enhancement-title">🛡️ AIファクトチェック・アシスタント</h3>
+                 <div id="fact-check-wrapper">
+                    <!-- AIによるファクトチェック結果がここに挿入されます -->
+                 </div>
+              </div>
+              <div id="article-output" class="markdown-body"></div>
+              <div id="faq-container" class="hidden"></div>
+            </div>
+            <div id="references-container" class="hidden">
+              <h3>参照元情報</h3>
+              <ul id="references"></ul>
+            </div>
+            <div id="enhancements-container" class="hidden">
+              <h3 class="enhancement-title">✨ 投稿アシスト機能</h3>
+              <div class="enhancement-item">
+                  <h4>タイトル案</h4>
+                  <ul id="title-suggestions"></ul>
+              </div>
+              <div class="enhancement-item">
+                  <h4>SNSシェア用テキスト</h4>
+                  <div class="copyable-wrapper">
+                      <textarea id="sns-output" class="copy-textarea" readonly></textarea>
+                      <button class="copy-small-button" data-target="sns-output" title="コピー">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                      </button>
+                  </div>
+              </div>
+              <div class="enhancement-item">
+                  <h4>ハッシュタグ提案</h4>
+                  <div id="hashtags-output"></div>
+              </div>
+              <div class="enhancement-item">
+                  <h4>メタディスクリプション (SEO用)</h4>
+                  <div class="copyable-wrapper">
+                      <textarea id="meta-output" class="copy-textarea" readonly></textarea>
+                       <button class="copy-small-button" data-target="meta-output" title="コピー">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                      </button>
+                  </div>
+              </div>
+            </div>
+            <div id="expansion-container" class="hidden">
+              <h3 class="enhancement-title">🚀 コンテンツ展開</h3>
+              <p class="strategy-instruction">生成した記事を、他のメディアフォーマットに自動変換します。</p>
+              <div class="expansion-actions">
+                  <button class="expansion-btn" data-format="twitter">
+                      <span class="button-text">X (Twitter) スレッド</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+                  <button class="expansion-btn" data-format="youtube">
+                      <span class="button-text">YouTube 動画台本</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+                  <button class="expansion-btn" data-format="presentation">
+                      <span class="button-text">プレゼン構成案</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+              </div>
+              <div id="expansion-result-container" class="hidden">
+                <div class="copyable-wrapper">
+                  <textarea id="expansion-output" class="copy-textarea" readonly></textarea>
+                  <button class="copy-small-button" data-target="expansion-output" title="コピー">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="edit-mode-container" class="hidden">
+            <div class="result-header">
+              <h2>記事を編集 (Markdown)</h2>
+            </div>
+            <div class="edit-wrapper">
+              <textarea id="edit-textarea"></textarea>
+              <div id="co-pilot-panel" class="co-pilot-panel">
+                  <h3>🤖 AI編集コパイロット</h3>
+                  <p>AIに記事の改善点を提案させ、ワンクリックで修正できます。</p>
+                  <button id="co-pilot-analyze-btn">
+                      <span class="button-text">ドキュメントを分析</span>
+                      <div class="spinner hidden"></div>
+                  </button>
+                  <ul id="co-pilot-suggestions-list">
+                      <!-- AIによる提案がここに挿入されます -->
+                  </ul>
+              </div>
+            </div>
+            <div class="edit-actions">
+              <button id="cancel-edit-button" class="secondary-button">キャンセル</button>
+              <button id="save-edit-button">変更を保存</button>
+            </div>
+          </div>
+        </div>
+        <div id="initial-message">
+            <p>左のフォームに情報を入力するか、「戦略立案モード」でAIの提案を受けて、高品質な記事の自動生成を始めましょう。</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- API Key Modal -->
+  <div id="api-key-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button id="close-api-key-modal-btn" class="modal-close-btn">&times;</button>
+        <h2>APIキー設定</h2>
+        <p>Google AI Studioで取得したAPIキーを入力してください。キーはブラウザのローカルストレージに安全に保存されます。</p>
+        <div id="api-key-status" class="api-key-status"></div>
+        <div class="form-group">
+            <label for="api-key-input">Google Gemini API Key</label>
+            <input type="password" id="api-key-input" placeholder="APIキーをここに貼り付け...">
+        </div>
+        <p class="form-hint">
+          APIキーは<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>から取得できます。
+        </p>
+        <div class="modal-actions">
+           <button id="clear-api-key-btn" class="secondary-button">キーを削除</button>
+           <button id="save-api-key-btn">キーを保存して検証</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Brand Voice Modal -->
+  <div id="brand-voice-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+          <button class="modal-close-btn">&times;</button>
+          <h2>ブランドボイス設定</h2>
+          <p>あなたの文体をAIに学習させ、生成される記事のトーンを統一します。</p>
+          <div class="form-group">
+              <label for="brand-voice-principles">執筆の基本原則</label>
+              <textarea id="brand-voice-principles" rows="4" placeholder="例: 常にシンプルな言葉を使う。専門用語は避ける。読者に寄り添うポジティブなトーンを維持する。"></textarea>
+          </div>
+          <div class="form-group">
+              <label for="brand-voice-example">あなたの文体サンプル (500文字以上推奨)</label>
+              <textarea id="brand-voice-example" rows="10" placeholder="ここにあなたが書いたブログ記事や文章を貼り付けてください..."></textarea>
+          </div>
+          <button id="save-brand-voice-btn">設定を保存</button>
+      </div>
+  </div>
+  
+  <!-- Performance Modal -->
+  <div id="performance-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button id="close-performance-modal-btn" class="modal-close-btn">&times;</button>
+        <h2>📈 パフォーマンスを記録</h2>
+        <p>公開後の記事の成果を記録して、AIの学習に役立てましょう。</p>
+        <div class="form-group">
+            <label for="performance-views">閲覧数 (PV)</label>
+            <input type="text" id="performance-views" placeholder="例: 10500">
+        </div>
+        <div class="form-group">
+            <label for="performance-engagement-rate">エンゲージメント率 (%)</label>
+            <input type="text" id="performance-engagement-rate" placeholder="例: 5.8">
+        </div>
+         <div class="form-group">
+            <label for="performance-conversions">コンバージョン数 (CV)</label>
+            <input type="text" id="performance-conversions" placeholder="例: 120">
+        </div>
+        <button id="save-performance-btn">記録を保存</button>
+    </div>
+  </div>
+
+  <!-- Research Assistant Modal -->
+  <div id="research-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+          <button id="close-research-modal-btn" class="modal-close-btn">&times;</button>
+          <h2>🤖 AIリサーチアシスタント</h2>
+          <p>選択したトピックについて、AIが最新情報を元に深掘りしました。</p>
+          <div id="research-modal-content">
+              <div id="research-spinner" class="spinner-container hidden">
+                  <div class="spinner"></div>
+                  <p>AIが調査・執筆中です...</p>
+              </div>
+              <div id="research-results">
+                <textarea id="research-output" readonly></textarea>
+                <div id="research-references-container" class="hidden">
+                    <h4>参照元情報</h4>
+                    <ul id="research-references"></ul>
+                </div>
+              </div>
+          </div>
+          <div class="research-actions">
+              <button id="insert-research-btn" class="hidden">記事に挿入</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Schedule Modal -->
+  <div id="schedule-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button id="close-schedule-modal-btn" class="modal-close-btn">&times;</button>
+        <h2>📅 コンテンツを予約</h2>
+        <p>この記事の公開日時を設定してください。</p>
+        <div class="form-group">
+            <label for="schedule-datetime">公開日時</label>
+            <input type="datetime-local" id="schedule-datetime" name="schedule-datetime">
+        </div>
+        <div class="schedule-actions">
+           <button id="remove-schedule-btn" class="secondary-button hidden">予約を解除</button>
+           <button id="save-schedule-btn">予約を設定</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Content Audit Modal -->
+  <div id="audit-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <button id="close-audit-modal-btn" class="modal-close-btn">&times;</button>
+        <h2>🔄 コンテンツ鮮度監査</h2>
+        <p>AIがこの記事の最新性をチェックし、更新案を提案します。</p>
+        <div id="audit-modal-content">
+            <div id="audit-spinner" class="spinner-container hidden">
+                <div class="spinner"></div>
+                <p>Google検索で最新情報を調査し、記事と比較しています...</p>
+            </div>
+            <div id="audit-results" class="hidden">
+              <!-- Audit results will be injected here -->
+            </div>
+        </div>
+        <div class="audit-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+            <button id="edit-with-suggestions-btn" class="hidden">提案を元に編集する</button>
+        </div>
+    </div>
+  </div>
+  
+  <!-- Product Preview Modal -->
+  <div id="product-preview-modal" class="modal-overlay hidden">
+    <div class="modal-content product-preview-content">
+        <button id="close-product-preview-modal-btn" class="modal-close-btn">&times;</button>
+        <div id="product-preview-body">
+            <!-- Product preview content is dynamically inserted here -->
+        </div>
+    </div>
+  </div>
+
+  <div id="context-menu" class="context-menu hidden"></div>
+  <script type="module" src="index.tsx"></script>
+</body>
+</html>
